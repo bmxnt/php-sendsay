@@ -3,9 +3,8 @@
     "description": "Object-oriented interface to Sendsay API.",
     "type": "library",
     "require": {
-        "php": ">=5.4",
+        "php": ">=5.5.0",
         "guzzlehttp/guzzle": "~6",
-        "guzzlehttp/log-subscriber": "~1.0",
         "monolog/monolog": "~1.0"
     },
     "require-dev": {

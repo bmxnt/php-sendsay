@@ -4,7 +4,9 @@ namespace Sendsay\Client;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Message\ResponseInterface;
-use GuzzleHttp\Subscriber\Log\LogSubscriber;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\MessageFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Sendsay\Exception\TooManyRedirectsException;
@@ -39,14 +41,17 @@ class Client implements ClientInterface
         }
         
         $this->credentials = $credentials;
+        $stack = HandlerStack::create();
+        $stack->push(
+            Middleware::log(
+                new Logger('api.sendsay', [
+                    new StreamHandler($options['log.path'], Logger::INFO)
+                ]),
+                new MessageFormatter('{req_body} - {res_body}')
+            )
+        );
 
-        $logger = new Logger('api.sendsay', [
-            new StreamHandler($options['log.path'], Logger::INFO)
-        ]);
-        $subscriber = new LogSubscriber($logger);
-        $this->httpClient = new HttpClient();
-        $this->httpClient->getEmitter()->attach($subscriber);
-
+        $this->httpClient = new HttpClient(['handler' => $stack]);
         $this->login();
     }
 
