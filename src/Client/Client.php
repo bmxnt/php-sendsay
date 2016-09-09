@@ -135,10 +135,15 @@ class Client implements ClientInterface
         /** @var ResponseInterface $response */
         $response = $this->httpClient->post($url, [
             'verify' => false,
-            'body' => $params
+            'form_params' => $params
         ]);
 
-        return $response->json();
+        return json_decode(
+            (string) $response->getBody(),
+            true,
+            512,
+            0
+        );
     }
 
     /**
